@@ -22,9 +22,9 @@ slicesTest = 16 ;
 imsz = 32 ;  % Size of images after downsampling
 
 load mri D  % in-built brain MR (128 x 128)
-imgTrain      = imresize(single(D(:,:,1,slicesTrain)), [imsz imsz])  ;
-imgValidation = imresize(single(D(:,:,1,slicesValidation)), [imsz imsz]) ;
-imgTest       = imresize(single(D(:,:,1,slicesTest)), [imsz imsz]) ;
+imgTrain      = imresize(double(D(:,:,1,slicesTrain)), [imsz imsz])  ;
+imgValidation = imresize(double(D(:,:,1,slicesValidation)), [imsz imsz]) ;
+imgTest       = imresize(double(D(:,:,1,slicesTest)), [imsz imsz]) ;
 
 % Set shot sequence
 N = size(imgTrain,1) ;  % number of phase encodes
