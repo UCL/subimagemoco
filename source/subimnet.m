@@ -7,9 +7,9 @@ function subimnet
 % See also gensubimage randDisplacement
 
 
-dExtent = 8 ; % +/- displacement extent in pixels 
+dExtent = 4 ; % +/- displacement extent in pixels 
 
-nTrain = 1024 ;     % number of training sets
+nTrain = 1024*10 ;     % number of training sets
 nValidation = 128 ;    % number of validation sets
 nTest = 128 ;          % number of test data sets
 
