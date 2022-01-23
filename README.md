@@ -6,7 +6,7 @@ https://www.overleaf.com/read/zdphnxpztspy
 
 Overleaf file on January 20, 2022 refered to code at Git Tag `20Jan2022`.
 
-The stable git branch is `master`, not `main`. The principle function is `subimage.m`
+The stable git branch is `master`, not `main`. The principle function is `subimage.m` in the `source` folder.
 
 The code is being developed using the MATLAB Project functionality, hence the additional files. 
 
