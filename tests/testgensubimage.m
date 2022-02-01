@@ -78,7 +78,8 @@ classdef testgensubimage < matlab.unittest.TestCase
             % checks on outputs.
 
             shot = 6 ; refShot = 6 ; n = 1;  trans = 3 ; 
-            [X, Y, kbad] = gensubimage(testCase.testimg, shot, testCase.shot2ky, trans, n, refShot) ;
+            imgOrder = 1; cshifts = [0 0] ;
+            [X, Y, kbad] = gensubimage(testCase.testimg, shot, testCase.shot2ky, trans, n, refShot, imgOrder, cshifts) ;
 
             testCase.verifyThat(size(X,4),IsEqualTo(n))
             testCase.verifyThat(size(kbad,3),IsEqualTo(n))
@@ -86,7 +87,7 @@ classdef testgensubimage < matlab.unittest.TestCase
 
             % no motion and shot==refShot so difference should be zero
             shot = 6 ; refShot = 6 ; n = 1;  trans = 0 ; 
-            [X, Y, kbad] = gensubimage(testCase.testimg, shot, testCase.shot2ky, trans, n, refShot) ;
+            [X, Y, kbad] = gensubimage(testCase.testimg, shot, testCase.shot2ky, trans, n, refShot, imgOrder, cshifts) ;
 
             testCase.verifyThat(X(:,:,1,1),IsEqualTo(0*testCase.testimg,'Within',...
                 AbsoluteTolerance(max(testCase.testimg(:))/100000)))

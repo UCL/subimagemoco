@@ -1,5 +1,5 @@
 function subimnet
-% SUBIMNET Sub Image Network for MR motion correction
+% SUBIMNET Network for sub image based MR motion correction
 %
 %
 % Copyright 2022, David Atkinson, University College London
@@ -7,7 +7,7 @@ function subimnet
 % See also gensubimage randDisplacement
 
 
-dExtent = 4 ; % +/- displacement extent in pixels 
+dExtent = 4 ; % +/- displacement extent in pixels for motion corruption
 
 nTrain = 1024*10 ;     % number of training sets
 nValidation = 128 ;    % number of validation sets
@@ -53,11 +53,24 @@ transTrain      = randDisplacement(dExtent, nTrain) ;
 transValidation = randDisplacement(dExtent, nValidation) ;
 transTest       = randDisplacement(dExtent, nTest) ;
 
-[XTrain, YTrain, ~] =  gensubimage(imgTrain, shot, shot2ky, transTrain, nTrain, refShot) ;
+% order of 'slices' to take from img for augmentation
+imgOrderTrain      = randi(length(slicesTrain),[nTrain 1]) ;
+imgOrderValidation = randi(length(slicesValidation),[nValidation 1]) ;
+imgOrderTest       = randi(length(slicesTest),[nTest 1]) ;
 
-[XValidation, YValidation, ~] = gensubimage(imgValidation, shot, shot2ky, transValidation, nValidation, refShot) ;
+% circshifts to apply prior to motion for augmentation
+cshiftsTrain = randi(5,[nTrain 2])-3 ; 
+cshiftsValidation = randi(5,[nValidation 2])-3 ; 
+cshiftsTest = randi(5,[nTest 2])-3 ; 
 
-[XTest, YTest, kTest] =  gensubimage(imgTest, shot, shot2ky, transTest, nTest, refShot) ;
+[XTrain, YTrain, ~] =  gensubimage(imgTrain, shot, shot2ky, transTrain, ...
+    nTrain, refShot, imgOrderTrain, cshiftsTrain) ;
+
+[XValidation, YValidation, ~] = gensubimage(imgValidation, shot, shot2ky, ...
+    transValidation, nValidation, refShot, imgOrderValidation, cshiftsValidation) ;
+
+[XTest, YTest, kTest] =  gensubimage(imgTest, shot, shot2ky, transTest, ...
+    nTest, refShot, imgOrderTest, cshiftsTest) ;
 
 % This layer arrangement was originally taken from the MATLAB help pages
 % "Train Convolutional Neural Network for Regression"
@@ -134,7 +147,7 @@ tstamp = ['(',char(datetime),')'] ;
 figure('Name',['Training range ', tstamp])
 nPlot = 21 ;
 transPlot = linspace(-dExtent,dExtent,nPlot) ;
-[XP,~] = gensubimage(imgTrain, shot, shot2ky, transPlot, nPlot, refShot) ;
+[XP,~] = gensubimage(imgTrain, shot, shot2ky, transPlot, nPlot, refShot, imgOrderTrain(1:nPlot), cshiftsTrain(1:nPlot,:)) ;
 
 tiledlayout('flow','TileSpacing','compact','padding','compact')
 for iV = 1:nPlot

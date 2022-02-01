@@ -1,45 +1,55 @@
-function [X, Y, kbad] = gensubimage(imgin, shot, shot2ky, trans, n, refShot)
+function [X, Y, kbad] = gensubimage(imgin, shot, shot2ky, trans, nOut, refShot, imgOrder, cshifts)
 % GENSUBIMAGE Generate sub images
 %  Generates data for training, validation and testing.
-%  For augmentation, picks images from 'slices' of imgin at random, 
-%  applies random offset in (integer steps between -2 and 2 in x and y).
-% Then applies the displacements specified in trans.
+%  For augmentation, picks images from 'slices' of imgin according to imgOrder, 
+%  applies random offsets from cshifts
+% Then applies the motion-corrupting displacements specified in trans.
 %
-% [X, Y, kbad] = gensubimage(imgin, shot, shot2ky, trans, n, refShot)
+% [X, Y, kbad] = gensubimage(imgin, shot, shot2ky, trans, nOut, refShot, imgOrder, cshifts)
 %
-% imgin [ ny nx nSlice]  here nSlice is number of images supplied 
+% imgin [ ny nx 1 nSlice]  here nSlice is number of images supplied 
 %  (nSlice could be slices or images from different subjects. 
 %  'slices' picked at random)
 % shot    shot number
 % shot2ky cell array giving ky line numbers for given shot
-% n       number of output images
+% nOut    number of output images
 % refShot number of shot treated as the reference (usually the one
 %                            containing the ky=0 line, i.e. shot 1)
-% X is [ ny nx 1 n]  subimages returned as modulus data. These are the
+% imgOrder [nSlice 1]  indices of 'slices' from imgin to use.
+% cshifts  [nSlice 2]  integer x and y shifts to be applied in augmentation
+%
+% X is [ ny nx 1 nOut]  subimages returned as modulus data. These are the
 % difference between complex images of the refShot and the perturbed shot.
-% Y is [n 1]         the translations applied
-% kbad [ ny nx n]    k-space of the full data with one shot corrupted.
+% Y is [nOut 1]         the translations applied
+% kbad [ ny nx nOut]    k-space of the full data with one shot corrupted.
 %
 % Copyright 2022, David Atkinson, University College London
 %
 % See also d_apply_shot
 
-X = zeros([size(imgin,1) size(imgin,2) 1 n]) ; % subsampled images
-Y = zeros([n 1]) ; % displacements
+X = zeros([size(imgin,1) size(imgin,2) 1 nOut]) ; % subsampled images
+Y = zeros([nOut 1]) ; % displacements
 
-nSlice = size(imgin,3) ; % These could be slices or different data sets
+nSlice = size(imgin,4) ; % These could be slices or different data sets
+if max(imgOrder) > nSlice || min(imgOrder)<1
+    error('imgOrder should index into imgin')
+end
+if length(imgOrder) ~= nOut
+    error('Number of slices and order size mismatch')
+end
+if size(cshifts,1) ~= nOut
+    error('Number of cshifts and images does not match')
+end
 
-kbad = zeros([size(imgin,1) size(imgin,2), n]) ;
+kbad = zeros([size(imgin,1) size(imgin,2), nOut]) ;
 
-for iim = 1:n
-    % pick 'slice' at random
-    randSlice = randi(nSlice) ;
-    img = imgin(:,:,randSlice) ;
+for iim = 1:nOut
+    % augmentation 
+    
+    img = imgin(:,:,1,imgOrder(iim)) ;
 
     % apply random integer shifts in x and y
-    yshift = randi(5)-3;
-    xshift = randi(5)-3;
-    img=circshift(img,[yshift xshift]) ;
+    img=circshift(img,cshifts(iim,:)) ;
 
     ksp = i2k(img) ;
 
