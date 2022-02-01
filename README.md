@@ -4,7 +4,7 @@ Motion Correction of multi-shot MR data using sub images
 Additional documentation on shared Overleaf:
 https://www.overleaf.com/read/zdphnxpztspy 
 
-Overleaf file on January 20, 2022 refered to code at Git Tag `20Jan2022`.
+Overleaf file on February 1, 2022 refered to code at Git Tag `1Feb2022`. The version on 20 January 2022 contained a bug. Fixing this has improved the results.
 
 The stable git branch is `master`, not `main`. The principle function is `subimage.m` in the `source` folder.
 
